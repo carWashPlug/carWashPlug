@@ -1,0 +1,27 @@
+{
+  "name": "carwashplug",
+  "version": "1.0.0",
+  "description": "car washing queue system",
+  "main": "app.js",
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carWashPlug/carWashPlug.git"
+  },
+  "author": "Danny, Martha, Tony, Sarah",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/carWashPlug/carWashPlug/issues"
+  },
+  "homepage": "https://github.com/carWashPlug/carWashPlug#readme",
+  "dependencies": {
+    "chance": "^1.1.8",
+    "eslint": "^8.22.0",
+    "express": "^4.18.1",
+    "jest": "^28.1.3",
+    "socket.io": "^4.5.1",
+    "socket.io-client": "^4.5.1"
+  }
+}
