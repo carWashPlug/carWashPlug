@@ -1,5 +1,6 @@
 const socketIo = require('socket.io');
 const io = socketIo(3000);
+const Chance = new require('chance')();
 
 const customer = io.of('/customer');
 const carwash = io.of('/carwash');
@@ -72,12 +73,13 @@ customer.on('connect', (customer) => {
 
 
   customer.on('carWashRequested', (data) => {
+    const mobileWorkerAvailable = Chance.pickone(['Berry', 'Clark', 'Bruce', 'Pedro']);
     customer.join(data.payload.customer); // 4949495858ikljl
-
+    data.mobileWorkerAvailable = mobileWorkerAvailable;
     console.log('CUSTOMER SOCKET.id', customer.id);
     console.log('carWashQueue::', carwashQueue);
     // console.log('EVENT', data);
-    carwash.emit('newJobForEmployee', data);
+    carwash.to(mobileWorkerAvailable).emit('newJobForEmployee', data);
     customer.emit('driverInRoute');
 
   });
