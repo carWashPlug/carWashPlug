@@ -1,5 +1,6 @@
 const socketIo = require('socket.io');
 const io = socketIo(3000);
+const Chance = new require('chance')();
 
 const customer = io.of('/customer');
 const carwash = io.of('/carwash');
@@ -17,13 +18,33 @@ io.on('connection', (client) => {
 
 //CARWASH.IO>>>>>>>>>
 carwash.on('connect', (carwash) => {
-
-  carwash.on('newCar', (mobileWorker) => {
+  //MOBILE WORKERS IN SEPERATE ROOMS
+  carwash.on('newWorker', (mobileWorker) => {
     console.log('SocketID:', carwash.id);
-    console.log('creating new room for cars ', mobileWorker);
-
+    console.log('creating new room for mobileWorker=>', mobileWorker);
     carwash.join(mobileWorker);
   });
+
+  carwash.on('noWorkers', (message) => {
+    console.log('No worker here YOOOO!', message);
+  });
+
+  carwash.on('in-progress', (carwashData) => {
+    // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', carwashData);
+    carwashData.status = 'in-progress';
+    console.log('EVENT', carwashData);
+    customer.to(carwashData.messageID).emit('carWashInProgress', carwashData);
+    // customer.emit('carWashInProgress', carwashData);
+
+  });
+
+  carwash.on('Car-wash-complete', (carwashData) => {
+    carwashData.status = 'Completed';
+    console.log('EVENT', carwashData);
+    customer.to(carwashData.messageID).emit('customerReceipt', carwashData);
+    // customer.emit('customerReceipt', carwashData);
+  });
+
 
 });
 
@@ -42,39 +63,24 @@ customer.on('connect', (customer) => {
       });
     });
     if (messageArry.length > 0) {
-      customer.emit('VendorQueue', messageArry);
+      customer.emit('carwashQueue', messageArry);
     }
   }
 
-  customer.on('getAll', (vendor) => {
-    getAll(vendor);
+  customer.on('getAll', (customerName) => {
+    getAll(customerName);
   });
 
-  customer.on('order', () => {
-    // console.log('new order from', data);
-    customer.emit('createOrder');
-  });
 
-  //JOINS ROOMS
-  customer.on('newcarWash', (vehicle) => {
-    // console.log('car names in app.js: ', carName);
-    console.log('creating new room in app.js for ', vehicle);
-    console.log('SocketID from app.js:', customer.id);
-    customer.join(vehicle);
-    // carwash.emit('createOrder', carName);
-  });
-
-  customer.on('carWashReady', (data) => {
-
-    console.log('VENDOR QUEUE', carwashQueue);
-    console.log('EVENT', data);
-
-
-
-
-    // const driverName = Chance.pickone(['driver1', 'driver2', 'driver3']);
-    // data.driverName = driverName;
-    // carwash.to(driverName).emit('newOrderForDriver', data);
+  customer.on('carWashRequested', (data) => {
+    const mobileWorkerAvailable = Chance.pickone(['Berry', 'Clark', 'Bruce', 'Pedro']);
+    customer.join(data.payload.customer); // 4949495858ikljl
+    data.mobileWorkerAvailable = mobileWorkerAvailable;
+    console.log('CUSTOMER SOCKET.id', customer.id);
+    console.log('carWashQueue::', carwashQueue);
+    // console.log('EVENT', data);
+    carwash.to(mobileWorkerAvailable).emit('newJobForEmployee', data);
+    customer.emit('driverInRoute');
 
   });
 
