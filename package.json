@@ -2,9 +2,12 @@
   "name": "carwashplug",
   "version": "1.0.0",
   "description": "car washing queue system",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "server": "node server.js",
+    "customer": "node customer.js",
+    "employee": "node employee.js"
   },
   "repository": {
     "type": "git",
